@@ -12,7 +12,7 @@ import RecentSessions from "@/components/recent-sessions";
 import JupyterInstance from "@/components/jupyter-instance";
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
   const [currentView, setCurrentView] = useState<"dashboard" | "jupyter">("dashboard");
   const [activeSession, setActiveSession] = useState<(Session & { jupyterUrl?: string; token?: string }) | null>(null);
@@ -95,6 +95,15 @@ export default function DashboardPage() {
                 </button>
                 <button type="button" className="ml-3 p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none">
                   <span className="material-icons">help_outline</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                  className="ml-3 p-1 px-3 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none flex items-center text-sm"
+                >
+                  <span className="material-icons mr-1 text-sm">logout</span> 
+                  {logoutMutation.isPending ? "Signing out..." : "Sign out"}
                 </button>
               </div>
             </div>

@@ -72,9 +72,9 @@ export default function AuthPage() {
         <div className="w-full max-w-md">
           <div className="flex items-center mb-8">
             <div className="h-10 w-10 bg-primary rounded-md flex items-center justify-center text-white font-bold">
-              DT
+              CA
             </div>
-            <h1 className="ml-3 text-2xl font-semibold text-secondary">DevTools Hub</h1>
+            <h1 className="ml-3 text-2xl font-semibold text-secondary">CloudDev Access</h1>
           </div>
 
           <Tabs defaultValue="login" className="w-full">
@@ -140,7 +140,7 @@ export default function AuthPage() {
                 <CardHeader>
                   <CardTitle>Create an account</CardTitle>
                   <CardDescription>
-                    Join the DevTools Hub platform
+                    Join the CloudDev Access platform
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
