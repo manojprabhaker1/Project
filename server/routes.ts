@@ -5,9 +5,17 @@ import { startJupyterInstance, stopJupyterInstance, checkJupyterStatus } from ".
 import { z } from "zod";
 import { insertSessionSchema, insertCreditTransactionSchema } from "@shared/schema";
 
+// Type definition for Jupyter instance - matches the one in jupyter.ts
+interface JupyterInstance {
+  processId: string;
+  url: string;
+  token: string;
+  process: any;
+}
+
 // Helper function for requiring user to be authenticated
 function requireAuth(req: Request, res: Response, next: Function) {
-  if (!req.isAuthenticated()) {
+  if (!req.isAuthenticated() || !req.user) {
     return res.status(401).json({ message: "Not authenticated" });
   }
   next();
@@ -15,7 +23,7 @@ function requireAuth(req: Request, res: Response, next: Function) {
 
 // Helper function for requiring user to be an admin
 function requireAdmin(req: Request, res: Response, next: Function) {
-  if (!req.isAuthenticated() || !req.user.isAdmin) {
+  if (!req.isAuthenticated() || !req.user || !req.user.isAdmin) {
     return res.status(403).json({ message: "Not authorized" });
   }
   next();
@@ -26,7 +34,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // User profile endpoint
   app.get("/api/profile", requireAuth, async (req, res) => {
-    res.json(req.user);
+    // requireAuth middleware ensures req.user exists
+    res.json(req.user!);
   });
 
   // Get all development tools
@@ -37,21 +46,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get user sessions
   app.get("/api/sessions", requireAuth, async (req, res) => {
-    const userId = req.user.id;
+    // requireAuth middleware ensures req.user exists
+    const userId = req.user!.id;
     const sessions = await storage.getUserSessions(userId);
     res.json(sessions);
   });
 
   // Get active sessions for a user
   app.get("/api/sessions/active", requireAuth, async (req, res) => {
-    const userId = req.user.id;
+    // requireAuth middleware ensures req.user exists
+    const userId = req.user!.id;
     const sessions = await storage.getActiveUserSessions(userId);
     res.json(sessions);
   });
 
   // Start a new tool session
   app.post("/api/sessions", requireAuth, async (req, res) => {
-    const userId = req.user.id;
+    // requireAuth middleware ensures req.user exists
+    const userId = req.user!.id;
     const parsedBody = insertSessionSchema.safeParse(req.body);
     
     if (!parsedBody.success) {
@@ -120,7 +132,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // End a session
   app.post("/api/sessions/:id/end", requireAuth, async (req, res) => {
     const sessionId = parseInt(req.params.id);
-    const userId = req.user.id;
+    // requireAuth middleware ensures req.user exists
+    const userId = req.user!.id;
     
     const session = await storage.getSessionById(sessionId);
     
@@ -128,7 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "Session not found" });
     }
     
-    if (session.userId !== userId && !req.user.isAdmin) {
+    if (session.userId !== userId && !req.user!.isAdmin) {
       return res.status(403).json({ message: "Not authorized to end this session" });
     }
     
@@ -185,7 +198,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const { userId, amount, description } = parsedBody.data;
-    const adminId = req.user.id;
+    // requireAdmin middleware ensures req.user exists
+    const adminId = req.user!.id;
     
     // Check if user exists
     const user = await storage.getUser(userId);
@@ -216,17 +230,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Include the token when the server is running
       if (status === "running") {
-        // Find the instance info from the activeInstances map
-        const instances = Array.from(
-          (global as any).activeJupyterInstances?.values() || []
-        );
-        const jupyterInstance = instances.find(i => i.processId === processId);
-        
-        if (jupyterInstance) {
-          return res.json({ 
-            status,
-            token: jupyterInstance.token
-          });
+        try {
+          // Import the instances from jupyter.ts
+          const { activeInstances } = await import('./jupyter');
+          const instance = activeInstances.get(processId) as JupyterInstance | undefined;
+          
+          if (instance && instance.token) {
+            return res.json({ 
+              status,
+              token: instance.token
+            });
+          }
+        } catch (err) {
+          console.error("Error retrieving Jupyter instance:", err);
         }
       }
       
@@ -238,14 +254,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get user credit history
   app.get("/api/credits/history", requireAuth, async (req, res) => {
-    const userId = req.user.id;
+    // requireAuth middleware ensures req.user exists
+    const userId = req.user!.id;
     const transactions = await storage.getUserCreditTransactions(userId);
     res.json(transactions);
   });
 
   // Get user session history
   app.get("/api/sessions/history", requireAuth, async (req, res) => {
-    const userId = req.user.id;
+    // requireAuth middleware ensures req.user exists
+    const userId = req.user!.id;
     const sessions = await storage.getUserSessionHistory(userId);
     res.json(sessions);
   });
