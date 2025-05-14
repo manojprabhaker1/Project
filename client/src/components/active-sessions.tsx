@@ -48,9 +48,14 @@ export default function ActiveSessions({
         const data = await res.json();
         
         if (data.status === "running") {
+          // Get the current hostname for proper URL construction
+          const hostname = window.location.hostname;
+          const jupyterPort = 8888;
+          const jupyterUrl = window.location.protocol + '//' + hostname + ':' + jupyterPort;
+          
           onOpenSession({
             ...session,
-            jupyterUrl: "http://localhost:8888",
+            jupyterUrl: jupyterUrl,
             token: data.token
           });
         } else {

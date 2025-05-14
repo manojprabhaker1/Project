@@ -14,8 +14,11 @@ export default function JupyterInstance({ session, onBack }: JupyterInstanceProp
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Handle URL - could be from local dev or from Replit
-  const jupyterUrl = session.jupyterUrl || "http://localhost:8888";
+  // Handle URL - construct from provided URL or fallback
+  const hostname = window.location.hostname;
+  const jupyterPort = 8888;
+  const fallbackUrl = window.location.protocol + '//' + hostname + ':' + jupyterPort;
+  const jupyterUrl = session.jupyterUrl || fallbackUrl;
   const token = session.token || "";
   const iframeUrl = `${jupyterUrl}?token=${token}`;
   

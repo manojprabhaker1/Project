@@ -12,7 +12,10 @@ interface JupyterInstance {
   process: any;
 }
 
-const activeInstances: Map<string, JupyterInstance> = new Map();
+// Export active instances so they can be accessed by other modules
+export const activeInstances: Map<string, JupyterInstance> = new Map();
+// Store in global for easy access
+(global as any).activeJupyterInstances = activeInstances;
 
 export async function startJupyterInstance(): Promise<{ processId: string; url: string; token: string } | null> {
   try {

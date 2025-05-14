@@ -213,6 +213,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const status = await checkJupyterStatus(processId);
+      
+      // Include the token when the server is running
+      if (status === "running") {
+        // Find the instance info from the activeInstances map
+        const instances = Array.from(
+          (global as any).activeJupyterInstances?.values() || []
+        );
+        const jupyterInstance = instances.find(i => i.processId === processId);
+        
+        if (jupyterInstance) {
+          return res.json({ 
+            status,
+            token: jupyterInstance.token
+          });
+        }
+      }
+      
       res.json({ status });
     } catch (error) {
       res.status(500).json({ message: "Failed to check Jupyter status" });
