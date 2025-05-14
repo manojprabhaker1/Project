@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Tool, Session } from "@shared/schema";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import ActiveSessions from "@/components/active-sessions";
 import ToolCard from "@/components/tool-card";
 import UsageStatistics from "@/components/usage-statistics";
@@ -12,6 +13,7 @@ import JupyterInstance from "@/components/jupyter-instance";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [currentView, setCurrentView] = useState<"dashboard" | "jupyter">("dashboard");
   const [activeSession, setActiveSession] = useState<(Session & { jupyterUrl?: string; token?: string }) | null>(null);
   
@@ -38,11 +40,21 @@ export default function DashboardPage() {
     queryKey: ["/api/sessions/history"],
   });
 
-  // Function to launch Jupyter when needed
+  // Function to launch tool session when needed
   const handleOpenSession = (session: Session & { jupyterUrl?: string; token?: string }) => {
-    if (session.toolName?.toLowerCase().includes("jupyter")) {
+    // Get tool name
+    const tool = tools?.find(t => t.id === session.toolId);
+    const toolName = tool?.name || '';
+    
+    if (toolName.toLowerCase().includes("jupyter")) {
       setActiveSession(session);
       setCurrentView("jupyter");
+    } else {
+      // For other tools, show a toast message
+      toast({
+        title: `${toolName} Session`,
+        description: "This tool is ready to use. Implementation in progress.",
+      });
     }
   };
 

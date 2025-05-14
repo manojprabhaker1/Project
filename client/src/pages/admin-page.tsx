@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Redirect } from "wouter";
 import CreditManagement from "@/components/credit-management";
+import * as React from "react";
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -15,17 +16,22 @@ export default function AdminPage() {
   const { 
     data: users, 
     isLoading: isLoadingUsers,
-    refetch: refetchUsers 
+    refetch: refetchUsers,
+    error: usersError 
   } = useQuery<User[]>({
-    queryKey: ["/api/admin/users"],
-    onError: (error) => {
+    queryKey: ["/api/admin/users"]
+  });
+  
+  // Handle errors if any
+  React.useEffect(() => {
+    if (usersError) {
       toast({
         title: "Error loading users",
-        description: error.message,
+        description: (usersError as Error).message || "Failed to load users",
         variant: "destructive",
       });
     }
-  });
+  }, [usersError, toast]);
   
   // Redirect if not an admin
   if (user && !user.isAdmin) {
