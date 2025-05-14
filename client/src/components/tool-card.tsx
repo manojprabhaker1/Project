@@ -28,6 +28,7 @@ export default function ToolCard({ tool, userCredits, onSessionCreated }: ToolCa
     setIsLaunching(true);
     try {
       await apiRequest("POST", "/api/sessions", {
+        userId: 1, // This will be replaced by server with actual user.id
         toolId: tool.id,
         status: "active",
       });

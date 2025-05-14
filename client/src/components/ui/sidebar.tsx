@@ -38,9 +38,9 @@ export function Sidebar({ activePage }: SidebarProps) {
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center">
           <div className="h-8 w-8 bg-primary rounded-md flex items-center justify-center text-white font-bold">
-            DT
+            CA
           </div>
-          <span className="ml-2 text-xl font-semibold text-secondary">DevTools Hub</span>
+          <span className="ml-2 text-xl font-semibold text-secondary">CloudDev Access</span>
         </div>
       </div>
 
@@ -78,12 +78,11 @@ export function Sidebar({ activePage }: SidebarProps) {
       {/* Navigation */}
       <div className="py-4 flex-grow">
         <nav className="px-4 space-y-1">
-          <Link href="/">
-            <a className={`sidebar-item flex items-center px-2 py-2 rounded-md text-sm font-medium ${activePage === 'dashboard' ? 'active text-primary' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}>
+          <div className={`sidebar-item flex items-center px-2 py-2 rounded-md text-sm font-medium ${activePage === 'dashboard' ? 'active text-primary' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`} 
+            onClick={() => navigate("/")}>
               <span className={`material-icons mr-3 ${activePage === 'dashboard' ? 'text-primary' : 'text-gray-500'}`}>dashboard</span>
               Dashboard
-            </a>
-          </Link>
+          </div>
           <a href="#" className="sidebar-item flex items-center px-2 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50">
             <span className="material-icons text-gray-500 mr-3">code</span>
             My Workspaces
@@ -104,18 +103,20 @@ export function Sidebar({ activePage }: SidebarProps) {
                 Administration
               </h3>
               <div className="mt-2 space-y-1">
-                <Link href="/admin">
-                  <a className={`sidebar-item flex items-center px-2 py-2 rounded-md text-sm font-medium ${activePage === 'admin' ? 'active text-primary' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}>
-                    <span className={`material-icons mr-3 ${activePage === 'admin' ? 'text-primary' : 'text-gray-500'}`}>people</span>
-                    User Management
-                  </a>
-                </Link>
-                <Link href="/admin">
-                  <a className={`sidebar-item flex items-center px-2 py-2 rounded-md text-sm font-medium ${activePage === 'credits' ? 'active text-primary' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}>
-                    <span className={`material-icons mr-3 ${activePage === 'credits' ? 'text-primary' : 'text-gray-500'}`}>toll</span>
-                    Credit Allocation
-                  </a>
-                </Link>
+                <div
+                  className={`sidebar-item flex items-center px-2 py-2 rounded-md text-sm font-medium cursor-pointer ${activePage === 'admin' ? 'active text-primary' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
+                  onClick={() => navigate("/admin")}
+                >
+                  <span className={`material-icons mr-3 ${activePage === 'admin' ? 'text-primary' : 'text-gray-500'}`}>people</span>
+                  User Management
+                </div>
+                <div
+                  className={`sidebar-item flex items-center px-2 py-2 rounded-md text-sm font-medium cursor-pointer ${activePage === 'credits' ? 'active text-primary' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
+                  onClick={() => navigate("/admin")}
+                >
+                  <span className={`material-icons mr-3 ${activePage === 'credits' ? 'text-primary' : 'text-gray-500'}`}>toll</span>
+                  Credit Allocation
+                </div>
                 <a href="#" className="sidebar-item flex items-center px-2 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50">
                   <span className="material-icons text-gray-500 mr-3">settings</span>
                   System Settings

@@ -67,9 +67,9 @@ export default function DashboardPage() {
               <div className="flex">
                 <div className="flex-shrink-0 flex items-center md:hidden">
                   <div className="h-8 w-8 bg-primary rounded-md flex items-center justify-center text-white font-bold">
-                    DT
+                    CA
                   </div>
-                  <span className="ml-2 text-xl font-semibold text-secondary">DevTools Hub</span>
+                  <span className="ml-2 text-xl font-semibold text-secondary">CloudDev Access</span>
                 </div>
                 <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
                   <div className="px-3 py-2 text-sm font-medium text-gray-900">
