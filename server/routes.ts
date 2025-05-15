@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { startJupyterInstance, stopJupyterInstance, checkJupyterStatus } from "./jupyter";
 import { z } from "zod";
 import { insertSessionSchema, insertCreditTransactionSchema } from "@shared/schema";
+import { hashPassword } from "./auth";
 
 // Type definition for Jupyter instance - matches the one in jupyter.ts
 interface JupyterInstance {
@@ -65,44 +66,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // requireAuth middleware ensures req.user exists
     const userId = req.user!.id;
     const parsedBody = insertSessionSchema.safeParse(req.body);
-    
+
     if (!parsedBody.success) {
       return res.status(400).json({ message: "Invalid session data" });
     }
-    
+
     const { toolId } = parsedBody.data;
-    
+
     // Check if user has enough credits
     const user = await storage.getUser(userId);
     const tool = await storage.getTool(toolId);
-    
+
     if (!user || !tool) {
       return res.status(404).json({ message: "User or tool not found" });
     }
-    
+
     if (user.credits < tool.creditsPerHour) {
       return res.status(400).json({ message: "Not enough credits" });
     }
-    
+
     // For Jupyter specific handling
     if (tool.name.toLowerCase().includes("jupyter")) {
       try {
         const jupyterInfo = await startJupyterInstance();
-        
+
         if (!jupyterInfo) {
           return res.status(500).json({ message: "Failed to start Jupyter instance" });
         }
-        
+
         // Create the session
         const session = await storage.createSession({
           userId,
           toolId,
           status: "active",
         });
-        
+
         // Update the session with process ID
         await storage.updateSessionProcess(session.id, jupyterInfo.processId);
-        
+
         res.status(201).json({
           ...session,
           toolName: tool.name,
@@ -121,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         toolId,
         status: "active",
       });
-      
+
       res.status(201).json({
         ...session,
         toolName: tool.name
@@ -134,17 +135,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const sessionId = parseInt(req.params.id);
     // requireAuth middleware ensures req.user exists
     const userId = req.user!.id;
-    
+
     const session = await storage.getSessionById(sessionId);
-    
+
     if (!session) {
       return res.status(404).json({ message: "Session not found" });
     }
-    
+
     if (session.userId !== userId && !req.user!.isAdmin) {
       return res.status(403).json({ message: "Not authorized to end this session" });
     }
-    
+
     // If it's a Jupyter session, stop the process
     if (session.processId) {
       try {
@@ -154,24 +155,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Continue with ending the session even if stopping the process fails
       }
     }
-    
+
     // Calculate credits used
     const tool = await storage.getTool(session.toolId);
     if (!tool) {
       return res.status(500).json({ message: "Tool not found" });
     }
-    
+
     const startTime = new Date(session.startTime);
     const endTime = new Date();
     const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
     const creditsUsed = Math.ceil(durationHours * tool.creditsPerHour);
-    
+
     // Update session
     const updatedSession = await storage.endSession(sessionId, creditsUsed);
-    
+
     // Deduct credits from user
     await storage.updateUserCredits(userId, -creditsUsed);
-    
+
     // Record credit transaction
     await storage.createCreditTransaction({
       userId,
@@ -179,8 +180,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       description: `Used ${creditsUsed} credits for ${tool.name} session`,
       performedBy: userId,
     });
-    
+
     res.json(updatedSession);
+  });
+
+  // Admin: Create new user
+  app.post("/api/admin/users", requireAdmin, async (req, res) => {
+    try {
+      const user = await storage.createUser({
+        ...req.body,
+        password: await hashPassword(req.body.password),
+      });
+      res.status(201).json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create user" });
+    }
   });
 
   // Admin: Get all users
@@ -192,24 +206,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin: Add credits to a user
   app.post("/api/admin/credits", requireAdmin, async (req, res) => {
     const parsedBody = insertCreditTransactionSchema.safeParse(req.body);
-    
+
     if (!parsedBody.success) {
       return res.status(400).json({ message: "Invalid credit transaction data" });
     }
-    
+
     const { userId, amount, description } = parsedBody.data;
     // requireAdmin middleware ensures req.user exists
     const adminId = req.user!.id;
-    
+
     // Check if user exists
     const user = await storage.getUser(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     // Add credits to user
     await storage.updateUserCredits(userId, amount);
-    
+
     // Record transaction
     const transaction = await storage.createCreditTransaction({
       userId,
@@ -217,24 +231,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       description,
       performedBy: adminId,
     });
-    
+
     res.status(201).json(transaction);
   });
 
   // Check Jupyter status
   app.get("/api/jupyter/status/:processId", requireAuth, async (req, res) => {
     const { processId } = req.params;
-    
+
     try {
       const status = await checkJupyterStatus(processId);
-      
+
       // Include the token when the server is running
       if (status === "running") {
         try {
           // Import the instances from jupyter.ts
           const { activeInstances } = await import('./jupyter');
           const instance = activeInstances.get(processId) as JupyterInstance | undefined;
-          
+
           if (instance && instance.token) {
             return res.json({ 
               status,
@@ -245,7 +259,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error("Error retrieving Jupyter instance:", err);
         }
       }
-      
+
       res.json({ status });
     } catch (error) {
       res.status(500).json({ message: "Failed to check Jupyter status" });
@@ -273,7 +287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const totalUsers = await storage.getTotalUsers();
     const totalActiveSessions = await storage.getTotalActiveSessions();
     const totalCreditsUsed = await storage.getTotalCreditsUsed();
-    
+
     res.json({
       totalUsers,
       totalActiveSessions,
