@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { startJupyterInstance, stopJupyterInstance, checkJupyterStatus } from "./jupyter";
 import { z } from "zod";
 import { insertSessionSchema, insertCreditTransactionSchema } from "@shared/schema";
-import { hashPassword } from "./auth";
+
 
 // Type definition for Jupyter instance - matches the one in jupyter.ts
 interface JupyterInstance {
