@@ -13,24 +13,24 @@ interface JupyterInstanceProps {
 export default function JupyterInstance({ session, onBack }: JupyterInstanceProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Handle URL - construct from provided URL or fallback
   const hostname = window.location.hostname;
   const jupyterUrl = session.jupyterUrl || `${window.location.protocol}//${hostname}`;
   const token = session.token || "";
-  const iframeUrl = `${jupyterUrl}/proxy/8888/tree?token=${token}`;
+  const iframeUrl = `${jupyterUrl}/proxy/8888/lab`;
   const apiUrl = `${window.location.protocol}//${hostname}`;
-  
+
   // Log the URL we're trying to access for debugging
   console.log("Jupyter URL: ", jupyterUrl);
-  
+
   // Check if the Jupyter server is ready
   useEffect(() => {
     const checkJupyterStatus = async () => {
       try {
         // Simple check to see if Jupyter is responding
         const response = await fetch(`${apiUrl}/api/jupyter/status/${session.id}?token=${token}`);
-        
+
         if (response.ok) {
           setIsLoading(false);
           setError(null);
@@ -77,7 +77,7 @@ export default function JupyterInstance({ session, onBack }: JupyterInstanceProp
                   <p className="text-sm text-gray-500 mt-2">This may take a few moments...</p>
                 </>
               )}
-              
+
               {error && (
                 <Alert className="mb-4">
                   <AlertDescription>{error}</AlertDescription>
@@ -97,7 +97,7 @@ export default function JupyterInstance({ session, onBack }: JupyterInstanceProp
           </div>
         )}
       </div>
-      
+
       {/* Footer with session information */}
       <div className="px-4 sm:px-6 lg:px-8 mt-4">
         <div className="bg-gray-50 rounded-md p-4 flex justify-between items-center">

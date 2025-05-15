@@ -36,7 +36,12 @@ export async function startJupyterInstance(userId?: number): Promise<{ processId
       `--notebook-dir=${userWorkspace}`,
       `--NotebookApp.token=${token}`,
       "--NotebookApp.allow_origin=*",
-      "--NotebookApp.disable_check_xsrf=True"
+      "--NotebookApp.disable_check_xsrf=True",
+      "--NotebookApp.password=''",
+      "--NotebookApp.default_url=/lab",
+      "--NotebookApp.base_url=/proxy/8888",
+      "--NotebookApp.tornado_settings={'headers': {'Content-Security-Policy': ''}}",
+      "--ServerApp.disable_check_xsrf=True"
     ]);
     
     let outputData = "";
