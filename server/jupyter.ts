@@ -42,7 +42,7 @@ export async function startJupyterInstance(userId?: number): Promise<{ processId
       "--ServerApp.disable_check_xsrf=True",
       "--ServerApp.base_url=/",
       "--ServerApp.allow_origin='*'",
-      "--ServerApp.allow_credentials='true'",
+      "--ServerApp.allow_credentials=true",
       "--ServerApp.default_url=/lab"
     ]);
 
