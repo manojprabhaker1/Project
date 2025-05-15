@@ -16,11 +16,9 @@ export default function JupyterInstance({ session, onBack }: JupyterInstanceProp
   
   // Handle URL - construct from provided URL or fallback
   const hostname = window.location.hostname;
-  const jupyterPort = 8888;
-  const fallbackUrl = window.location.protocol + '//' + hostname;
-  const jupyterUrl = session.jupyterUrl || fallbackUrl;
+  const jupyterUrl = session.jupyterUrl || `${window.location.protocol}//${hostname}`;
   const token = session.token || "";
-  const iframeUrl = `${jupyterUrl}?token=${token}`;
+  const iframeUrl = `${jupyterUrl}/tree?token=${token}`;
   const apiUrl = `${window.location.protocol}//${hostname}`;
   
   // Log the URL we're trying to access for debugging

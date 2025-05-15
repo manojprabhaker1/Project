@@ -34,9 +34,9 @@ export async function startJupyterInstance(userId?: number): Promise<{ processId
       "--ip=0.0.0.0",
       "--port=8888",
       `--notebook-dir=${userWorkspace}`,
-      "--ServerApp.root_dir=/",
       `--NotebookApp.token=${token}`,
-      "--NotebookApp.allow_origin=*"
+      "--NotebookApp.allow_origin=*",
+      "--NotebookApp.disable_check_xsrf=True"
     ]);
     
     let outputData = "";
