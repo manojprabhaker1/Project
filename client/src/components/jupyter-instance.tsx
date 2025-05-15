@@ -88,11 +88,11 @@ export default function JupyterInstance({ session, onBack }: JupyterInstanceProp
         ) : (
           <div className="w-full h-full flex-1 overflow-hidden rounded-md border border-gray-200 shadow-sm">
             <iframe
-              src={iframeUrl}
+              src={`${iframeUrl}?token=${token}`}
               title="Jupyter Notebook"
               className="w-full h-full"
-              allow="clipboard-read; clipboard-write"
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads"
+              allow="clipboard-read; clipboard-write; cross-origin-isolated"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals allow-popups-to-escape-sandbox"
             />
           </div>
         )}
