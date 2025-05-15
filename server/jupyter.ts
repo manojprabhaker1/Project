@@ -71,7 +71,7 @@ export async function startJupyterInstance(userId?: number): Promise<{ processId
     await sleep(2000);
 
     // Store in our active instances map
-    const replitUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+    const replitUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co:8888`;
     const jupyterUrl = replitUrl;
 
     const instance: JupyterInstance = {
