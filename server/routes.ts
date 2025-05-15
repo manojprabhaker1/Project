@@ -295,5 +295,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Admin: Create new tool
+  app.post("/api/admin/tools", requireAdmin, async (req, res) => {
+    try {
+      const tool = await storage.createTool(req.body);
+      res.status(201).json(tool);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create tool" });
+    }
+  });
+
+  // Admin: Update tool status
+  app.patch("/api/admin/tools/:id", requireAdmin, async (req, res) => {
+    try {
+      const toolId = parseInt(req.params.id);
+      const { isActive } = req.body;
+      const tool = await storage.updateToolStatus(toolId, isActive);
+      res.json(tool);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update tool" });
+    }
+  });
+
   return httpServer;
 }

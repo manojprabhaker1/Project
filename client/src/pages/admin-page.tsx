@@ -7,11 +7,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Redirect } from "wouter";
 import CreditManagement from "@/components/credit-management";
 import * as React from "react";
+import { Button } from "@/components/ui/button";
+import ToolManagement from "@/components/tool-management";
 
 export default function AdminPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   // Fetch users for admin
   const { 
     data: users, 
@@ -21,7 +23,7 @@ export default function AdminPage() {
   } = useQuery<User[]>({
     queryKey: ["/api/admin/users"]
   });
-  
+
   // Handle errors if any
   React.useEffect(() => {
     if (usersError) {
@@ -32,7 +34,7 @@ export default function AdminPage() {
       });
     }
   }, [usersError, toast]);
-  
+
   // Redirect if not an admin
   if (user && !user.isAdmin) {
     return <Redirect to="/" />;
@@ -42,7 +44,7 @@ export default function AdminPage() {
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
       <Sidebar activePage="admin" />
-      
+
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Top navigation */}
@@ -97,6 +99,9 @@ export default function AdminPage() {
               isLoading={isLoadingUsers}
               onCreditUpdate={() => refetchUsers()}
             />
+            <div className="mt-8">
+              <ToolManagement />
+            </div>
           </div>
         </main>
       </div>

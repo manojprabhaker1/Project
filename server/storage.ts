@@ -177,6 +177,17 @@ export class MemStorage implements IStorage {
     return Array.from(this.tools.values());
   }
 
+  async updateToolStatus(id: number, isActive: boolean): Promise<Tool> {
+    const tool = await this.getTool(id);
+    if (!tool) {
+      throw new Error("Tool not found");
+    }
+    
+    const updatedTool = { ...tool, isActive };
+    this.tools.set(id, updatedTool);
+    return updatedTool;
+  }
+
   // Session operations
   async getSessionById(id: number): Promise<Session | undefined> {
     return this.sessions.get(id);
