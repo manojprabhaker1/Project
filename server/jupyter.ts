@@ -45,7 +45,9 @@ export async function startJupyterInstance(userId?: number): Promise<{ processId
       "--ServerApp.allow_credentials=true",
       "--ServerApp.default_url=/lab",
       "--ServerApp.disable_cors=False",
-      "--ServerApp.tornado_settings={'headers': {'Content-Security-Policy': 'frame-ancestors self *'}}"
+      "--ServerApp.tornado_settings={'headers': {'Content-Security-Policy': 'frame-ancestors *', 'Access-Control-Allow-Origin': '*'}}",
+      "--ServerApp.use_redirect_file=False",
+      "--ServerApp.webbrowser_open_new=0"
     ]);
 
     let outputData = "";
