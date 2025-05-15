@@ -2,6 +2,7 @@ import { spawn } from "child_process";
 import { promisify } from "util";
 import { randomBytes } from "crypto";
 import { log } from "./vite";
+import fs from "fs";
 
 const sleep = promisify(setTimeout);
 
