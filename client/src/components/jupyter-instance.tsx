@@ -17,10 +17,11 @@ export default function JupyterInstance({ session, onBack }: JupyterInstanceProp
   // Handle URL - construct from provided URL or fallback
   const hostname = window.location.hostname;
   const jupyterPort = 8888;
-  const fallbackUrl = window.location.protocol + '//' + hostname + ':' + jupyterPort;
+  const fallbackUrl = window.location.protocol + '//' + hostname;
   const jupyterUrl = session.jupyterUrl || fallbackUrl;
   const token = session.token || "";
   const iframeUrl = `${jupyterUrl}?token=${token}`;
+  const apiUrl = `${window.location.protocol}//${hostname}`;
   
   // Log the URL we're trying to access for debugging
   console.log("Jupyter URL: ", jupyterUrl);
@@ -30,7 +31,7 @@ export default function JupyterInstance({ session, onBack }: JupyterInstanceProp
     const checkJupyterStatus = async () => {
       try {
         // Simple check to see if Jupyter is responding
-        const response = await fetch(`${jupyterUrl}/api/status?token=${token}`);
+        const response = await fetch(`${apiUrl}/api/jupyter/status/${session.id}?token=${token}`);
         
         if (response.ok) {
           setIsLoading(false);
