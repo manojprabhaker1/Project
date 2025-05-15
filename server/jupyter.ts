@@ -62,7 +62,8 @@ export async function startJupyterInstance(userId?: number): Promise<{ processId
     // Store in our active instances map
     // Use the Replit URL format instead of localhost
     const replitUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
-    const jupyterUrl = `${replitUrl}:8888`;
+    // Use the base URL without port for client-side access
+    const jupyterUrl = replitUrl;
     
     const instance: JupyterInstance = {
       processId,

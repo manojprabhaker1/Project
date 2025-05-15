@@ -18,7 +18,7 @@ export default function JupyterInstance({ session, onBack }: JupyterInstanceProp
   const hostname = window.location.hostname;
   const jupyterUrl = session.jupyterUrl || `${window.location.protocol}//${hostname}`;
   const token = session.token || "";
-  const iframeUrl = `${jupyterUrl}/tree?token=${token}`;
+  const iframeUrl = `${jupyterUrl}/proxy/8888/tree?token=${token}`;
   const apiUrl = `${window.location.protocol}//${hostname}`;
   
   // Log the URL we're trying to access for debugging
