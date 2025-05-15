@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/utils";
+import { apiRequest } from "@/lib/queryClient";
 
 const addCreditSchema = z.object({
   amount: z.number().min(1),
