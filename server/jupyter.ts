@@ -17,17 +17,23 @@ export const activeInstances: Map<string, JupyterInstance> = new Map();
 // Store in global for easy access
 (global as any).activeJupyterInstances = activeInstances;
 
-export async function startJupyterInstance(): Promise<{ processId: string; url: string; token: string } | null> {
+export async function startJupyterInstance(userId?: number): Promise<{ processId: string; url: string; token: string } | null> {
   try {
     const token = randomBytes(32).toString("hex");
     const processId = randomBytes(16).toString("hex");
     
-    // Command to start Jupyter notebook (using the one installed in pythonlibs)
+    // Create user-specific workspace directory
+    const userWorkspace = userId ? `/tmp/jupyter/${userId}` : '/tmp/jupyter/default';
+    await fs.promises.mkdir(userWorkspace, { recursive: true });
+    
+    // Command to start Jupyter notebook with user isolation
     const jupyterProcess = spawn("jupyter", [
       "notebook",
       "--no-browser",
       "--ip=0.0.0.0",
       "--port=8888",
+      `--notebook-dir=${userWorkspace}`,
+      "--ServerApp.root_dir=/",
       `--NotebookApp.token=${token}`,
       "--NotebookApp.allow_origin=*"
     ]);

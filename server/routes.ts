@@ -88,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // For Jupyter specific handling
     if (tool.name.toLowerCase().includes("jupyter")) {
       try {
-        const jupyterInfo = await startJupyterInstance();
+        const jupyterInfo = await startJupyterInstance(req.user?.id);
 
         if (!jupyterInfo) {
           return res.status(500).json({ message: "Failed to start Jupyter instance" });
