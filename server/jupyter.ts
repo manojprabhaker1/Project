@@ -23,7 +23,7 @@ export async function startJupyterInstance(): Promise<{ processId: string; url: 
     const processId = randomBytes(16).toString("hex");
     
     // Command to start Jupyter notebook (using the one installed in pythonlibs)
-    const jupyterProcess = spawn("./.pythonlibs/bin/jupyter", [
+    const jupyterProcess = spawn("jupyter", [
       "notebook",
       "--no-browser",
       "--ip=0.0.0.0",
